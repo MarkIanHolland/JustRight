@@ -1,14 +1,29 @@
 {
-  "name": "righttakeaway",
-  "version": "1.0.0",
+  "name": "justright",
+  "version": "0.0.1",
+  "type": "module",
   "description": "Make the right move to just eat",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "author": "",
-  "license": "ISC",
+  "main": "contentScript.ts",
+  "module": "./dist/contentScript.js",
+  "author": "Mark Ian Holland",
+  "license": "",
   "dependencies": {
-    "chrome-types": "^0.1.140"
+    "vite-plugin-dts": "^1.6.6"
+  },
+  "devDependencies": {
+    "@types/chrome": "^0.0.198",
+    "@typescript-eslint/eslint-plugin": "^5.40.0",
+    "@typescript-eslint/parser": "^5.40.0",
+    "chrome-types": "^0.1.140",
+    "eslint": "^8.25.0",
+    "prettier": "^2.7.1",
+    "typescript": "^4.8.4",
+    "vite": "^3.1.6"
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "test": "echo \"Error: no test specified\" && exit 1"
   }
 }
