@@ -6,6 +6,8 @@ import {
   InvalidRestaurantTemplate,
 } from "./errorCodes";
 
+import "./styles.scss";
+
 const GetPageModel = function (): RightMoveModel | null {
   // get the documents scripts and find page model
   const scripts = document.scripts;

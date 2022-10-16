@@ -16,7 +16,7 @@
       {
         "matches": ["https://www.rightmove.co.uk/properties/*"],
         "run_at": "document_idle",
-        "css": ["static/content.css"],
+        "css": ["dist/style.css"],
         "js": ["dist/contentScript.js"]
       }
     ],
