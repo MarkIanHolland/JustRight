@@ -1,0 +1,22 @@
+{
+    "manifest_version": 3,
+    "name": "Right Takeaway",
+    "description": "make the right move to just eat",
+    "version": "0.0.1",
+    "action": {
+      "default_popup": "popup.html",
+      "default_icon": "test.png"
+    },
+    "permissions": ["chrome.runtime"],
+    "host_permissions": ["https://www.rightmove.co.uk/properties/*", "https://*.api.just-eat.io/"],
+    "content_scripts": [
+      {
+        "matches": ["https://www.rightmove.co.uk/properties/*"],
+        "run_at": "document_idle",
+        "js": ["contentScript.js"]
+      }
+    ],
+    "background": {
+      "service_worker": "background.js"
+    }
+  }
