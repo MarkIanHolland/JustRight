@@ -12,13 +12,36 @@ const GetPageModel = function (): RightMoveModel | null {
   // get the documents scripts and find page model
   const scripts = document.scripts;
   const pageModelDeclaration = `window.PAGE_MODEL = `;
+  const pageModelSecondDeclaration = `window.adInfo`;
 
   for (const script of scripts) {
     const scriptText = script.innerText.trimStart();
-    if (scriptText.startsWith(pageModelDeclaration)) {
-      const pageModelJsonStr = scriptText.replace(pageModelDeclaration, ``);
+
+    if (!scriptText.startsWith(pageModelDeclaration)) {
+      continue;
+    }
+
+    let pageModelJsonStr = scriptText
+      .replace(pageModelDeclaration, ``)
+      .split(pageModelSecondDeclaration)[0]
+      .trimEnd();
+
+    if (!pageModelJsonStr.endsWith("}")) {
+      const lastClosedBracketIndex = pageModelJsonStr.lastIndexOf("}");
+      const stringUntilLastClosedBracket = pageModelJsonStr.substring(
+        0,
+        lastClosedBracketIndex + 1
+      );
+
+      pageModelJsonStr = stringUntilLastClosedBracket;
+    }
+
+    try {
       const pageModel = JSON.parse(pageModelJsonStr);
       return pageModel;
+    } catch (error) {
+      console.error("Failed to parse JSON:", error);
+      return null;
     }
   }
   return null;
@@ -26,12 +49,15 @@ const GetPageModel = function (): RightMoveModel | null {
 
 function BuildRestaurantsList(restaurantsResult: RestaurantResponse) {
   const { Area: area, Restaurants: restaurants } = restaurantsResult;
-  const titleText = `JustEat results in ${area}`;
+  const titleText = `JustEat in ${area}`;
   const template = document.createElement("template");
   template.innerHTML = `
       <details class="JustRight-Accordion">
         <summary>
           <span>${titleText}</span>
+          <svg role="img">
+            <use xlink:href="#chevron-line"></use>
+          </svg>
         </summary>
       </details>`;
   const itemTemplate = document.createElement("template");
@@ -91,27 +117,30 @@ function handleContentMatch() {
     `button > div > svg[data-testid=svg-broadband]`
   )?.parentElement?.parentElement?.parentElement;
 
-  chrome.runtime.sendMessage(postcode, (response: RestaurantResponse|string) => {
-    if(response === null || isString(response)){
-      throw InvalidJustEatResponse;
-    }
+  chrome.runtime.sendMessage(
+    postcode,
+    (response: RestaurantResponse | string) => {
+      if (response === null || isString(response)) {
+        throw InvalidJustEatResponse;
+      }
 
-    const restaurantsList = BuildRestaurantsList(response);
-    if (mortgageAffordabilityChecker !== null) {
-      console.debug(
-        "JustRight: Appending restaurants list after mortgage checker"
-      );
-      mortgageAffordabilityChecker.after(restaurantsList);
-    } else if (broadBandSpeed) {
-      console.debug(
-        "JustRight: Appending restaurants list after broadband speed"
-      );
-      broadBandSpeed.before(restaurantsList);
-    } else {
-      console.debug("JustRight: Appending restaurants list to body");
-      document.body.appendChild(restaurantsList);
+      const restaurantsList = BuildRestaurantsList(response);
+      if (mortgageAffordabilityChecker !== null) {
+        console.debug(
+          "JustRight: Appending restaurants list after mortgage checker"
+        );
+        mortgageAffordabilityChecker.after(restaurantsList);
+      } else if (broadBandSpeed) {
+        console.debug(
+          "JustRight: Appending restaurants list after broadband speed"
+        );
+        broadBandSpeed.before(restaurantsList);
+      } else {
+        console.debug("JustRight: Appending restaurants list to body");
+        document.body.appendChild(restaurantsList);
+      }
     }
-  });
+  );
 }
 
 handleContentMatch();
